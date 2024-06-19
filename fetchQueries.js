@@ -1,13 +1,10 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
-async function delay(s) {
-  return new Promise((res, rej) => {
-    setTimeout(() => {
-      res();
-    }, s * 1000);
-  });
+async function delay(seconds) {
+  return new Promise((resolve, reject) => setTimeout(resolve, seconds * 1000));
 }
 const MAX_NUM_CATGS = 16;
+
 let i;
 
 (async () => {

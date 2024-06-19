@@ -1,5 +1,7 @@
 const dotenv = require("dotenv").config();
 
+const { formatProducts } = require("./formatProducts");
+
 const axios = require("axios");
 const fs = require("fs");
 
@@ -12,7 +14,7 @@ const headers = {
 async function fetchProducts(query) {
   let currentPage = 0;
   let allProducts = [];
-  let totalHits = 0;
+  let numTotalProducts = 0;
 
   let normalizedProducts;
 
@@ -29,26 +31,13 @@ async function fetchProducts(query) {
       const response = await axios.post(process.env.API_URL, data, { headers });
       const totalProducts = response.data.results[0].hits;
 
-      totalHits = response.data.results[0].nbHits;
+      numTotalProducts = response.data.results[0].nbHits;
 
       allProducts = [...allProducts, ...totalProducts];
 
-      normalizedProducts = allProducts.map((el) => {
-        return {
-          productType: el.shwCardType,
-          englishDescription: el.name,
-          arabicDescription: el.crossLanguage,
-          id: el.ctId,
-          price: el.price,
-          currency: el.currency,
-          discountPerc: el.discountDiff,
-          undiscountedPrice: el.unmodifiedPrice,
-          inStock: el.inStock,
-        };
-      });
-      console.log(normalizedProducts);
+      normalizedProducts = formatProducts(allProducts);
 
-      if (allProducts.length >= totalHits) break;
+      if (allProducts.length >= numTotalProducts) break;
       currentPage += 1;
     } catch (error) {
       console.error(
@@ -57,7 +46,6 @@ async function fetchProducts(query) {
       );
     }
   }
-  console.log(allProducts.length);
 }
 
 fetchProducts("aa3f0317-b79e-43bc-b775-7a9a9113d1e5");
